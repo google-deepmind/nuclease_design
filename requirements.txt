@@ -1,0 +1,9 @@
+absl-py
+ipykernel
+numpy
+pandas
+scipy
+requests
+statsmodels
+pytest
+biopython
