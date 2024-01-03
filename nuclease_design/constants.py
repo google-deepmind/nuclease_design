@@ -1,4 +1,4 @@
-# Copyright 2023 DeepMind Technologies Limited
+# Copyright 2024 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -347,3 +347,7 @@ INDEX_TO_CORE_BASE_LABEL = {
     (114, 129): 'base',
     (135, 140): 'core',
 }
+
+
+VARIABLE_REGION_START_INDEX = 24
+VARIABLE_REGION_LENGTH = len(FULL_REFERENCE_SEQ) - VARIABLE_REGION_START_INDEX

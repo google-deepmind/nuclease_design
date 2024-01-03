@@ -1,4 +1,4 @@
-# Copyright 2023 DeepMind Technologies Limited
+# Copyright 2024 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@
 import functools
 from typing import Sequence, Tuple
 
+import pandas as pd
+from statsmodels.stats import weightstats
+
 from nuclease_design import constants
 from nuclease_design import preprocessing_utils
 from nuclease_design import utils
-import pandas as pd
-from statsmodels.stats import weightstats
 
 
 def get_pvalue(enrichment_factor, null_distribution_efs):

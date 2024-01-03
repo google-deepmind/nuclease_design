@@ -1,4 +1,4 @@
-# Copyright 2023 DeepMind Technologies Limited
+# Copyright 2024 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,17 +18,19 @@
 import functools
 import io
 import json
+import os
 from os import path
-from typing import Sequence
+from typing import IO, Sequence, Union
+
+import numpy as np
+import pandas as pd
+import requests
+from statsmodels.stats import multitest
 
 from nuclease_design import amino_acids
 from nuclease_design import constants
 from nuclease_design import data_utils
 from nuclease_design import metrics
-import numpy as np
-import pandas as pd
-import requests
-from statsmodels.stats import multitest
 
 
 AA_STR_TO_INT = dict(((aa, i) for i, aa in enumerate(amino_acids.AA)))
@@ -43,15 +45,28 @@ def _read_from_gcs(file_path: str):
   return io.BytesIO(response.content)
 
 
-def open_file(filename: str, mode: str, data_dir: str):
-  """Layer of indirection to allow for using native python `open`."""
+def open_file(filename: str, mode: str, data_dir: str) -> IO[Union[bytes, str]]:
+  """Layer of indirection for loading data from multiple locations."""
   full_filename = path.join(data_dir, filename)
 
   if data_dir == constants.GCS_DATA_DIR:
     if mode != 'r':
-      return ValueError('mode must be "r" when reading from GCS.')
+      raise ValueError('mode must be "r" when reading from GCS.')
     return _read_from_gcs(full_filename)
   return open(full_filename, mode)
+
+
+def copy_file(file_path, source_data_dir, target_data_dir, overwrite=False):
+  output_path = path.join(target_data_dir, file_path)
+  if not overwrite and path.exists(output_path):
+    return
+  os.makedirs(path.dirname(output_path))
+
+  source_bytes = open_file(
+      file_path, mode='rb', data_dir=source_data_dir
+  ).read()
+  with open(output_path, 'wb') as f:
+    f.write(source_bytes)
 
 
 def concat_unique_values(items):

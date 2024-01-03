@@ -1,4 +1,4 @@
-# Copyright 2023 DeepMind Technologies Limited
+# Copyright 2024 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@
 
 from absl.testing import absltest
 from absl.testing import parameterized
-from nuclease_design import preprocessing_utils
 import pandas as pd
+
+from nuclease_design import preprocessing_utils
 
 
 _MOCK_DATA_DIR = ""

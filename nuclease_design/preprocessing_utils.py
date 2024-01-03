@@ -1,4 +1,4 @@
-# Copyright 2023 DeepMind Technologies Limited
+# Copyright 2024 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,11 +17,10 @@
 
 import multiprocessing.pool
 from typing import Sequence, Tuple
+import pandas as pd
 
 from nuclease_design import data_utils
 from nuclease_design import utils
-import pandas as pd
-
 
 MutationTuple = data_utils.MutationTuple
 

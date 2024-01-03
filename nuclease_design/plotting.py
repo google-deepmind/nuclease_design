@@ -1,4 +1,4 @@
-# Copyright 2023 DeepMind Technologies Limited
+# Copyright 2024 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@ from typing import Sequence
 
 from matplotlib import gridspec
 import matplotlib.pyplot as plt
-from nuclease_design import amino_acids
-from nuclease_design import constants
-from nuclease_design import utils
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
+from nuclease_design import amino_acids
+from nuclease_design import constants
+from nuclease_design import utils
 
 
 WT_COLOR = sns.color_palette()[-3]  # grey
