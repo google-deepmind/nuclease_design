@@ -351,3 +351,10 @@ INDEX_TO_CORE_BASE_LABEL = {
 
 VARIABLE_REGION_START_INDEX = 24
 VARIABLE_REGION_LENGTH = len(FULL_REFERENCE_SEQ) - VARIABLE_REGION_START_INDEX
+
+LANDSCAPE_ACTIVITY_LEVELS = (
+    'non-functional',
+    'activity_greater_than_0',
+    'activity_greater_than_WT',
+    'activity_greater_than_A73R',
+)
