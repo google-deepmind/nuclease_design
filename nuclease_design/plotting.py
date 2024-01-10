@@ -19,6 +19,7 @@ from typing import Sequence
 
 from matplotlib import gridspec
 import matplotlib.pyplot as plt
+from matplotlib.ticker import LogLocator
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -341,7 +342,16 @@ def plot_purified_protein_activity(
   return ax
 
 
-def make_diversity_overlay_plot(
+def _get_initial_library_size_df(cluster_df, hue_feature) -> pd.DataFrame:
+  df = cluster_df.copy()
+  df = df[df['population'] == 'pre-sort']
+  # Hamming = 0 ensures that the # of clusters equals the # of sequences
+  df = df[df['max_intra_cluster_hamming_distance'] == 0]
+  # Since the cluster_df includes bootstrap resamples, we take a mean.
+  return df.groupby(hue_feature).agg('mean').reset_index()
+
+
+def plot_diversity_overlay(
     df,
     post_sort_population,
     hue_feature,
@@ -375,15 +385,33 @@ def make_diversity_overlay_plot(
     plt.xlabel('Cluster Diameter')
     sns.move_legend(ax, 'upper left', bbox_to_anchor=(1, 1))
     plt.ylim(bottom=1.0)
-    plt.xlim(left=0.0, right=xticks_max - 1)
+    plt.xlim(left=0, right=xticks_max - 1)
     ax.spines[['right', 'top']].set_visible(False)
+
+    # plot dot for initial library size
+    for i, hue_value in enumerate(hue_order):
+      color = palette[i]
+      initial_library_size_df = _get_initial_library_size_df(
+          plotdf, hue_feature
+      )
+      initial_library_size = initial_library_size_df[
+          initial_library_size_df[hue_feature] == hue_value
+      ]['num_clusters']
+      plt.plot(
+          0,
+          initial_library_size,
+          marker=9,
+          c=color,
+          label='Initial Library Size',
+          zorder=10,
+      )
 
     opacity_labels = [
         'post-sort',
         'pre-sort',
         'post-sort',
         'pre-sort',
-    ]  # TODO(neilthomas) make this not manual
+    ]
 
     for i, (line, poly) in enumerate(zip(ax.lines, ax.collections)):
       opacity_label = opacity_labels[i]
@@ -391,7 +419,12 @@ def make_diversity_overlay_plot(
       poly.set_alpha(interval_opacity_map[opacity_label])
 
     plt.xticks(list(range(0, xticks_max, 5)))
+
+  # set minor yticks
+  minor_locator = LogLocator(base=10.0, subs=np.linspace(0, 1, 11), numticks=10)
+  plt.gca().yaxis.set_minor_locator(minor_locator)
   sns.despine()
+  return ax
 
 
 def _add_mutations_to_count_matrix(counts, mutations, val, aa_to_index):
