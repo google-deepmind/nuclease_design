@@ -17,6 +17,8 @@
 
 import multiprocessing.pool
 from typing import Sequence, Tuple
+
+import numpy as np
 import pandas as pd
 
 from nuclease_design import data_utils
@@ -25,7 +27,7 @@ from nuclease_design import utils
 MutationTuple = data_utils.MutationTuple
 
 
-def load_raw_df(filepath: str, data_dir: str) -> pd.DataFrame:
+def load_count_df(filepath: str, data_dir: str) -> pd.DataFrame:
   """Loads count data from an unprocessed CSV file.
 
   Args:
@@ -57,7 +59,7 @@ def load_raw_df(filepath: str, data_dir: str) -> pd.DataFrame:
   df['nuc_mutations'] = df.nuc_mut_string.apply(data_utils.parse_mutants)
   df['mutations'] = df.mut_string.apply(data_utils.parse_mutants)
 
-  if (df.num_AA_mut != df.mutations.apply(len)).any():
+  if (df.num_AA_mut != df['mutations'].apply(len)).any():
     raise ValueError(
         'Parsed mutation string does have the expected number of mutations.')
 
@@ -93,7 +95,7 @@ def _outer_join_dfs(list_of_dfs: Sequence[pd.DataFrame]) -> pd.DataFrame:
   return df
 
 
-def load_raw_data_from_paths(
+def load_ngs_counts_from_paths(
     names_and_paths: Sequence[Tuple[str, str]],
     data_dir: str,
 ) -> pd.DataFrame:
@@ -112,11 +114,12 @@ def load_raw_data_from_paths(
 
   def load(name_and_path):
     name, path = name_and_path
-    df = load_raw_df(path, data_dir)
+    df = load_count_df(path, data_dir)
     df = group_by_dna_seq(df)
     df = df.rename(columns=dict(counts=name))
     # Drop any unused columns.
-    return df[mut_cols + [name]]
+    cols = mut_cols + [name]
+    return df[cols]
 
   with multiprocessing.pool.ThreadPool(len(names_and_paths)) as pool:
     dfs = list(pool.map(load, names_and_paths))
@@ -132,30 +135,22 @@ def load_raw_data_from_paths(
   return df
 
 
-def get_abundance(df: pd.DataFrame, count_cols: Sequence[str]) -> pd.Series:
-  """Returns the abundance of each variant, aggregating the specified columns.
-
-  Abundance is the proportion of total counts ascribed to each variant.
-
-  Args:
-    df: A DataFrame with columns of counts.
-    count_cols : The columns used to aggregate abundances.
-
-  Returns:
-    A Series of abundance values.
-
-  Raises:
-    ValueError: If not all count_cols are in the input dataframe
-  """
-  if not all(col in df.keys() for col in count_cols):
-    raise ValueError('Input dataframe does not have specified columns.')
-  variant_counts = df[count_cols].sum(axis=1)
-  abundance = variant_counts / variant_counts.sum()
-  return abundance
+def get_abundance(counts: Sequence[float]) -> np.ndarray:
+  """Returns the abundance given a sequence of counts."""
+  counts = np.array(counts)
+  total_count = counts.sum()
+  return counts / total_count
 
 
-def _convert_count_to_ef_col(count_col: str) -> str:
-  return 'ef_' + count_col.lstrip('read_count_')
+def get_enrichment_factor(
+    input_abundance: Sequence[float], post_sort_abundance: Sequence[float]
+) -> np.ndarray:
+  """Returns the enrichment factor."""
+  return np.array(post_sort_abundance) / np.array(input_abundance)
+
+
+def _get_ef_column_name(count_col_name: str) -> str:
+  return 'ef_' + count_col_name.removeprefix('read_count_')
 
 
 def get_enrichment_factor_df(
@@ -164,9 +159,8 @@ def get_enrichment_factor_df(
     post_sort_count_cols: Sequence[str],
     count_threshold: int = 10,
     group_aa_seqs: bool = True,
-    drop_introduced_stop_codons: bool = True,
-    drop_mutations_to_stop_codon: bool = True) -> pd.DataFrame:
-  """Computes enrichment factors and filter stop codons.
+) -> pd.DataFrame:
+  """Computes enrichment factors.
 
   In an experiment (or "sort"), variants are sorted according to their ability
   to reach some activity threshold. The enrichment factor for a variant in a
@@ -186,10 +180,6 @@ def get_enrichment_factor_df(
       in at least one input_count_col in order to be kept.
     group_aa_seqs: If True, report enrichment factors for amino acid sequences,
       else, for nucleic acid sequences.
-    drop_introduced_stop_codons: If True, drop variants that introduce stop
-      codons in the final output.
-    drop_mutations_to_stop_codon: If True, drop variants that modify a stop
-      codon in the final output.
 
   Returns:
      A DataFrame with one row per variant, and columns corresponding to
@@ -201,49 +191,33 @@ def get_enrichment_factor_df(
   max_input_read_count = df[input_count_cols].max(axis=1)
   df = df[max_input_read_count >= count_threshold]
 
+  # consider AA or DNA variants
   if group_aa_seqs:
     df = df.drop(columns=['nuc_mutations'])
     df = df.groupby('mutations').agg('sum').reset_index()
     df = df.sort_values(by='mutations', key=lambda col: [len(s) for s in col])
   else:
+    if df['nuc_mutations'].nunique() != df.shape[0]:
+      raise ValueError('Expected nuc_mutations column to be unique')
     df = df.sort_values(
         by='nuc_mutations', key=lambda col: [len(s) for s in col]
     )
 
-  input_abundance = get_abundance(df, input_count_cols)
-  if not input_abundance.min() > 0:
-    raise ValueError('Invalid input abundance of 0')
+  # sum all input counts
+  input_counts = df[input_count_cols].sum(axis=1)
+  input_abundance = get_abundance(input_counts)
+  if input_abundance.min() <= 0:
+    raise ValueError(
+        f'Invalid minimum input abundance: {input_abundance.min()}'
+    )
 
-  for count_col in post_sort_count_cols:
-    ef_col_name = _convert_count_to_ef_col(count_col)
-    df[ef_col_name] = get_abundance(df, [count_col]) / input_abundance
-
-  if drop_introduced_stop_codons:
-    introduces_stop_codon = df.mutations.apply(data_utils.introduces_stop_codon)
-    df = df[~introduces_stop_codon]
-    print('{} variants introduced stop codons'.format(
-        introduces_stop_codon.sum()))
-
-  if drop_mutations_to_stop_codon:
-    mutates_stop_codon = df.mutations.apply(data_utils.mutates_stop_codon)
-    df = df[~mutates_stop_codon]
-    print('{} variants mutated the WT stop codon'.format(
-        mutates_stop_codon.sum()))
-
+  # compute enrichment factors
+  for post_sort_count_col in post_sort_count_cols:
+    ef_col_name = _get_ef_column_name(post_sort_count_col)
+    df[ef_col_name] = get_enrichment_factor(
+        input_abundance, get_abundance(df[post_sort_count_col])
+    )
   return df.reset_index(drop=True)
-
-
-def get_wt_synonym_df(outer_join_df: pd.DataFrame,
-                      input_count_cols: Sequence[str],
-                      post_sort_count_cols: Sequence[str],
-                      count_threshold: int = 10) -> pd.DataFrame:
-  """Gets enrichment factors for synonymous wildtype variants."""
-  return get_synonym_df(
-      outer_join_df,
-      data_utils.WILDTYPE_MUTATION_TUPLE,
-      input_count_cols,
-      post_sort_count_cols,
-      count_threshold=count_threshold)
 
 
 def get_synonym_df(outer_join_df: pd.DataFrame,
@@ -258,7 +232,7 @@ def get_synonym_df(outer_join_df: pd.DataFrame,
       post_sort_count_cols,
       count_threshold=count_threshold,
       group_aa_seqs=False)
-  return df[df.mutations == mutations]
+  return df[df['mutations'] == mutations]
 
 
 def get_stop_codon_df(
@@ -266,22 +240,16 @@ def get_stop_codon_df(
     input_count_cols: Sequence[str],
     post_sort_count_cols: Sequence[str],
     count_threshold: int = 10,
-    drop_mutations_to_stop_codon: bool = True) -> pd.DataFrame:
-  """Gets enrichment factors for variants that include stop codons."""
+) -> pd.DataFrame:
+  """Gets enrichment factors for variants to stop codons."""
   df = get_enrichment_factor_df(
       outer_join_df,
       input_count_cols,
       post_sort_count_cols,
       count_threshold=count_threshold,
       group_aa_seqs=True,
-      drop_introduced_stop_codons=False,
-      drop_mutations_to_stop_codon=False)
-
-  introduces_stop_codon = df.mutations.apply(data_utils.introduces_stop_codon)
-  if drop_mutations_to_stop_codon:
-    df = df[introduces_stop_codon]
-  else:
-    mutates_stop_codon = df.mutations.apply(data_utils.mutates_stop_codon)
-    df = df[introduces_stop_codon | mutates_stop_codon]
-
-  return df.copy()
+  )
+  introduces_stop_codon = df['mutations'].apply(
+      data_utils.introduces_stop_codon
+  )
+  return df[introduces_stop_codon].copy()

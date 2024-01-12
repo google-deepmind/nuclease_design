@@ -73,99 +73,84 @@ class EnrichmentFactorTest(parameterized.TestCase):
 
   @parameterized.named_parameters(
       dict(
-          testcase_name="drop everything",
-          count_threshold=9,
-          group_aa_seqs=True,
-          drop_introduced_stop_codons=True,
-          drop_mutations_to_stop_codon=True,
-          expected_output=pd.DataFrame(
-              dict(
-                  mutations=[(), (("A", 1, "T"), ("V", 2, "W"))],
-                  input1=[40.0, 30.0],
-                  input2=[10.0, 0.0],
-                  sort1=[2.0, 0.0],
-                  sort2=[20.0, 10.0],
-                  # input_abundance=[1 / 2, 3 / 10],
-                  ef_sort1=[2.0, 0.0],
-                  ef_sort2=[4 / 5, 2 / 3]))),
-      dict(
-          testcase_name="smaller count threshold",
-          count_threshold=8,
-          group_aa_seqs=True,
-          drop_introduced_stop_codons=True,
-          drop_mutations_to_stop_codon=True,
-          expected_output=pd.DataFrame(
-              dict(
-                  mutations=[(), (("A", 1, "T"), ("V", 2, "W"))],
-                  input1=[40.0, 30.0],
-                  input2=[10.0, 0.0],
-                  sort1=[2.0, 0.0],
-                  sort2=[20.0, 10.0],
-                  # input_abundance=[1 / 2, 3 / 10],
-                  ef_sort1=[2.0, 0.0],
-                  ef_sort2=[4 / 5, 2 / 3]))),
-      dict(
           testcase_name="keep stops",
           count_threshold=8,
           group_aa_seqs=True,
-          drop_introduced_stop_codons=False,
-          drop_mutations_to_stop_codon=True,
           expected_output=pd.DataFrame(
               dict(
-                  mutations=[(), (("A", 1, "*"),),
-                             (("A", 1, "T"), ("V", 2, "W"))],
-                  input1=[40.0, 10.0, 30.0],
-                  input2=[10.0, 0.0, 0.0],
-                  sort1=[2.0, 0.0, 0.0],
-                  sort2=[20.0, 10.0, 10.0],
-                  # input_abundance=[1 / 2, 1 / 10, 3 / 10],
-                  ef_sort1=[2.0, 0.0, 0.0],
-                  ef_sort2=[4 / 5, 2.0, 2 / 3]))),
+                  mutations=[
+                      (),
+                      (("*", 2, "A"),),
+                      (("A", 1, "*"),),
+                      (("A", 1, "T"), ("V", 2, "W")),
+                  ],
+                  input1=[40.0, 10.0, 10.0, 30.0],
+                  input2=[10.0, 0.0, 0.0, 0.0],
+                  sort1=[2.0, 0.0, 0.0, 0.0],
+                  sort2=[20.0, 10.0, 10.0, 10.0],
+                  # input_abundance=[1/2, 1/10, 1/10, 3/10],
+                  ef_sort1=[2.0, 0.0, 0.0, 0.0],
+                  ef_sort2=[4 / 5, 2.0, 2.0, 2 / 3],
+              )
+          ),
+      ),
       dict(
-          testcase_name="keep mutations to stop",
-          count_threshold=7,
+          testcase_name="lower threshold",
+          count_threshold=6,
           group_aa_seqs=True,
-          drop_introduced_stop_codons=True,
-          drop_mutations_to_stop_codon=False,
           expected_output=pd.DataFrame(
               dict(
-                  mutations=[(), (("*", 2, "A"),),
-                             (("A", 1, "T"), ("V", 2, "W"))],
-                  input1=[40.0, 10.0, 30.0],
-                  input2=[10.0, 0.0, 0.0],
-                  sort1=[2.0, 0.0, 0.0],
-                  sort2=[20.0, 10.0, 10.0],
-                  # input_abundance=[1 / 2, 1 / 10, 3 / 10],
-                  ef_sort1=[2.0, 0.0, 0.0],
-                  ef_sort2=[4 / 5, 2.0, 2 / 3]))),
+                  mutations=[
+                      (),
+                      (("*", 2, "A"),),
+                      (("A", 1, "*"),),
+                      (("A", 1, "T"), ("V", 2, "W")),
+                  ],
+                  input1=[40.0, 10.0, 10.0, 30.0],
+                  input2=[10.0, 0.0, 0.0, 0.0],
+                  sort1=[2.0, 0.0, 0.0, 0.0],
+                  sort2=[20.0, 10.0, 10.0, 10.0],
+                  # input_abundance=[1/2, 1/10, 1/10, 3/10],
+                  ef_sort1=[2.0, 0.0, 0.0, 0.0],
+                  ef_sort2=[4 / 5, 2.0, 2.0, 2 / 3],
+              )
+          ),
+      ),
       dict(
           testcase_name="dna variants",
           count_threshold=10,
           group_aa_seqs=False,
-          drop_introduced_stop_codons=True,
-          drop_mutations_to_stop_codon=True,
           expected_output=pd.DataFrame(
               dict(
-                  nuc_mutations=[(("A", 1, "C"),), (("A", 2, "C"),),
-                                 (("A", 5, "C"),)],
-                  mutations=[(), (), (("A", 1, "T"), ("V", 2, "W"))],
-                  input1=[30.0, 10.0, 30.0],
-                  input2=[10.0, 0.0, 0.0],
-                  sort1=[2.0, 0.0, 0.0],
-                  sort2=[10.0, 10.0, 10.0],
-                  # input_abundance=[4 / 10, 1 / 10, 3 / 10],
-                  ef_sort1=[10 / 4, 0.0, 0.0],
-                  ef_sort2=[1 / 2, 2.0, 2 / 3]))),
+                  nuc_mutations=[
+                      (("A", 1, "C"),),
+                      (("A", 2, "C"),),
+                      (("A", 3, "C"),),
+                      (("A", 4, "C"),),
+                      (("A", 5, "C"),),
+                  ],
+                  mutations=[
+                      (),
+                      (),
+                      (("A", 1, "*"),),
+                      (("*", 2, "A"),),
+                      (("A", 1, "T"), ("V", 2, "W")),
+                  ],
+                  input1=[30.0, 10.0, 10.0, 10.0, 30.0],
+                  input2=[10.0, 0.0, 0.0, 0.0, 0.0],
+                  sort1=[2.0, 0.0, 0.0, 0.0, 0.0],
+                  sort2=[10.0, 10.0, 10.0, 10.0, 10.0],
+                  # input_abundance=[4/10, 1/10, 1/10, 1/10, 3/10],
+                  ef_sort1=[10 / 4, 0.0, 0.0, 0.0, 0.0],
+                  ef_sort2=[1 / 2, 2.0, 2.0, 2.0, 2 / 3],
+              )
+          ),
+      ),
   )
-  def test_compute_ef(self,
-                      expected_output,
-                      count_threshold=10,
-                      group_aa_seqs=True,
-                      drop_introduced_stop_codons=True,
-                      drop_mutations_to_stop_codon=True):
+  def test_compute_ef(self, expected_output, count_threshold, group_aa_seqs):
     name_to_filename = self._write_mock_csvs()
 
-    outer_join_df = preprocessing_utils.load_raw_data_from_paths(
+    outer_join_df = preprocessing_utils.load_ngs_counts_from_paths(
         tuple(name_to_filename.items()), data_dir=_MOCK_DATA_DIR)
     processed_df = preprocessing_utils.get_enrichment_factor_df(
         outer_join_df,
@@ -173,16 +158,14 @@ class EnrichmentFactorTest(parameterized.TestCase):
         ["sort1", "sort2"],
         count_threshold=count_threshold,
         group_aa_seqs=group_aa_seqs,
-        drop_introduced_stop_codons=drop_introduced_stop_codons,
-        drop_mutations_to_stop_codon=drop_mutations_to_stop_codon,
     )
 
     pd.testing.assert_frame_equal(
         processed_df, expected_output, check_like=True)
 
-  def test_load_raw_data_from_paths(self):
+  def test_load_ngs_counts_from_paths(self):
     name_to_filename = self._write_mock_csvs()
-    outer_join_df = preprocessing_utils.load_raw_data_from_paths(
+    outer_join_df = preprocessing_utils.load_ngs_counts_from_paths(
         tuple(name_to_filename.items()), data_dir=_MOCK_DATA_DIR)
 
     expected_keys = ("mutations", "nuc_mutations", "input1", "input2", "sort1",
@@ -193,7 +176,7 @@ class EnrichmentFactorTest(parameterized.TestCase):
 
   def test_get_stop_codon_df(self):
     name_to_filename = self._write_mock_csvs()
-    outer_join_df = preprocessing_utils.load_raw_data_from_paths(
+    outer_join_df = preprocessing_utils.load_ngs_counts_from_paths(
         tuple(name_to_filename.items()), data_dir=_MOCK_DATA_DIR)
 
     df = preprocessing_utils.get_stop_codon_df(
@@ -201,9 +184,8 @@ class EnrichmentFactorTest(parameterized.TestCase):
         ["input1", "input2"],
         ["sort1", "sort2"],
         count_threshold=10,
-        drop_mutations_to_stop_codon=False,
     )
-    expected_mutations = ((("*", 2, "A"),), (("A", 1, "*"),))
+    expected_mutations = ((("A", 1, "*"),),)
     self.assertCountEqual(df.mutations, expected_mutations)
 
   @parameterized.named_parameters(
@@ -218,7 +200,7 @@ class EnrichmentFactorTest(parameterized.TestCase):
   )
   def test_get_synonym_df(self, mutations, expected_nuc_mutations):
     name_to_filename = self._write_mock_csvs()
-    outer_join_df = preprocessing_utils.load_raw_data_from_paths(
+    outer_join_df = preprocessing_utils.load_ngs_counts_from_paths(
         tuple(name_to_filename.items()), data_dir=_MOCK_DATA_DIR)
     df = preprocessing_utils.get_synonym_df(
         outer_join_df,

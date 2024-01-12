@@ -22,11 +22,15 @@ import pandas as pd
 from statsmodels.stats import weightstats
 
 from nuclease_design import constants
+from nuclease_design import data_utils
 from nuclease_design import preprocessing_utils
 from nuclease_design import utils
 
 
-def get_pvalue(enrichment_factor, null_distribution_efs):
+def get_pvalue(
+    enrichment_factor: float, null_distribution_efs: Sequence[float]
+) -> float:
+  """Returns the p-value from a pooled t-test."""
   return weightstats.ttest_ind(
       [
           enrichment_factor,
@@ -38,6 +42,36 @@ def get_pvalue(enrichment_factor, null_distribution_efs):
       # alternative distribution so this is forced.
       usevar='pooled',
   )[1]
+
+
+def _drop_introduces_stop_codons(df: pd.DataFrame) -> pd.DataFrame:
+  introduces_stop_codon = df['mutations'].apply(
+      data_utils.introduces_stop_codon
+  )
+  print(
+      '{} variants introduced stop codons'.format(introduces_stop_codon.sum())
+  )
+  return df[~introduces_stop_codon]
+
+
+def _drop_mutates_stop_codon(df: pd.DataFrame) -> pd.DataFrame:
+  mutates_stop_codon = df['mutations'].apply(data_utils.mutates_stop_codon)
+  print(
+      '{} variants mutated the WT stop codon'.format(mutates_stop_codon.sum())
+  )
+  return df[~mutates_stop_codon]
+
+
+def _get_fiducial_df_fn_for_fiducial(fiducial_name):
+  if fiducial_name == 'neg_control':
+    return preprocessing_utils.get_stop_codon_df
+  else:
+    fiducial_mutation_tuple = constants.FIDUCIAL_NAME_TO_MUTATION_TUPLE[
+        fiducial_name
+    ]
+    return functools.partial(
+        preprocessing_utils.get_synonym_df, mutations=fiducial_mutation_tuple
+    )
 
 
 def preprocess_generation(
@@ -75,50 +109,37 @@ def preprocess_generation(
       the dataframe
     includes synonymous DNA variants of the fiducial variant.
   """
-  count_df = preprocessing_utils.load_raw_data_from_paths(
+  count_df = preprocessing_utils.load_ngs_counts_from_paths(
       names_and_paths, data_dir
   )
   ef_df = preprocessing_utils.get_enrichment_factor_df(
       count_df, input_names, post_sort_names, count_threshold=count_threshold
   )
+  # remove stop codon mutations from variant DataFrame
+  ef_df = _drop_introduces_stop_codons(ef_df)
+  ef_df = _drop_mutates_stop_codon(ef_df)
 
-  # fiducial efs
+  # get fiducial enrichment factors
   fiducial_ef_dfs = {}
-  fiducial_ef_dfs['neg_control'] = preprocessing_utils.get_stop_codon_df(
-      count_df,
-      input_names,
-      post_sort_names,
-      count_threshold=count_threshold,
-  )
   for fiducial_name in fiducials:
-    if fiducial_name == 'neg_control':
-      get_df_fn = preprocessing_utils.get_stop_codon_df
-    else:
-      fiducial_mutation_tuple = constants.FIDUCIAL_NAME_TO_MUTATION_TUPLE[
-          fiducial_name
-      ]
-      get_df_fn = functools.partial(
-          preprocessing_utils.get_synonym_df, mutations=fiducial_mutation_tuple
-      )
-    fiducial_ef_dfs[fiducial_name] = get_df_fn(
+    get_fiducial_df_fn = _get_fiducial_df_fn_for_fiducial(fiducial_name)
+    fiducial_ef_dfs[fiducial_name] = get_fiducial_df_fn(
         outer_join_df=count_df,
         input_count_cols=input_names,
         post_sort_count_cols=post_sort_names,
         count_threshold=count_threshold,
     )
 
-  # pvalues
+  # compute pvalues
   for fiducial_name in fiducials:
     ef_col = utils.get_enrichment_factor_column_name(generation, fiducial_name)
-    fiducial_ef_df = fiducial_ef_dfs[fiducial_name]
-    null_distribution_efs = fiducial_ef_df[ef_col]
-    pvalues = ef_df[ef_col].apply(
-        get_pvalue, null_distribution_efs=null_distribution_efs
-    )
     pvalue_col = utils.get_pvalue_column_name(generation, fiducial_name)
+    pvalues = ef_df[ef_col].apply(
+        get_pvalue, null_distribution_efs=fiducial_ef_dfs[fiducial_name][ef_col]
+    )
     ef_df[pvalue_col] = pvalues
     is_hit_col = f'activity_greater_than_{fiducial_name}'
-    ef_df[is_hit_col] = utils.select_hits(ef_df[pvalue_col], utils.EXPECTED_FDR)
+    ef_df[is_hit_col] = utils.select_hits(pvalues, utils.EXPECTED_FDR)
   pvalue_df = ef_df.copy()
   pvalue_df['num_mutations'] = pvalue_df['mutations'].apply(len)
 
