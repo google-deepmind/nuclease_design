@@ -18,8 +18,8 @@
 from typing import Sequence
 
 from matplotlib import gridspec
+from matplotlib import ticker
 import matplotlib.pyplot as plt
-from matplotlib.ticker import LogLocator
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -42,7 +42,7 @@ DE3_COLOR = DE_COLOR
 DEFAULT_MIN_NUM_OBSERVATIONS_PER_BIN = 20
 
 
-def _set_fontsize(ax, fontsize) -> None:
+def set_fontsize(ax, fontsize) -> None:
   """Sets fontsize for `ax`."""
   for item in (
       [ax.title, ax.xaxis.label, ax.yaxis.label]
@@ -156,7 +156,7 @@ def plot_hit_rate_per_num_mutations(
   )
   ax.set_ylim(bottom=0.0)
   ax.set_xlim(left=1)
-  _set_fontsize(ax, fontsize)
+  set_fontsize(ax, fontsize)
   ax.legend(title=hue_feature, fontsize=fontsize, title_fontsize=fontsize)
   return ax
 
@@ -224,7 +224,7 @@ def plot_hit_rate_per_num_mutations_with_histogram(
         fontsize=fontsize,
     )
     ax0.legend(title=hue_feature, fontsize=fontsize, title_fontsize=fontsize)
-    _set_fontsize(ax0, fontsize)
+    set_fontsize(ax0, fontsize)
     for i, grouping in enumerate(hue_order):
       ax = plt.subplot(gs[i + 1], sharex=ax0)
       sns.histplot(
@@ -245,7 +245,7 @@ def plot_hit_rate_per_num_mutations_with_histogram(
       ax.tick_params('x', labelbottom=False)
       ax.legend_ = None
       ax.grid(False)
-      _set_fontsize(ax, fontsize)
+      set_fontsize(ax, fontsize)
 
   sns.despine()
   plt.tight_layout(pad=1)
@@ -344,11 +344,16 @@ def plot_purified_protein_activity(
 
 def _get_initial_library_size_df(cluster_df, hue_feature) -> pd.DataFrame:
   df = cluster_df.copy()
-  df = df[df['population'] == 'pre-sort']
+  df = df[df['population'] == 'pre-sort'].drop(columns=['population'])
   # Hamming = 0 ensures that the # of clusters equals the # of sequences
   df = df[df['max_intra_cluster_hamming_distance'] == 0]
   # Since the cluster_df includes bootstrap resamples, we take a mean.
-  return df.groupby(hue_feature).agg('mean').reset_index()
+  return (
+      df[[hue_feature, 'num_clusters', 'max_intra_cluster_hamming_distance']]
+      .groupby(hue_feature)
+      .agg('mean')
+      .reset_index()
+  )
 
 
 def plot_diversity_overlay(
@@ -421,7 +426,9 @@ def plot_diversity_overlay(
     plt.xticks(list(range(0, xticks_max, 5)))
 
   # set minor yticks
-  minor_locator = LogLocator(base=10.0, subs=np.linspace(0, 1, 11), numticks=10)
+  minor_locator = ticker.LogLocator(
+      base=10.0, subs=np.linspace(0, 1, 11), numticks=10
+  )
   plt.gca().yaxis.set_minor_locator(minor_locator)
   sns.despine()
   return ax
@@ -465,7 +472,7 @@ def make_mutation_heatmap(
   sns.heatmap(
       data=df,
       ax=ax,
-      xticklabels=5 if use_x_ticks else False,
+      xticklabels=25 if use_x_ticks else False,
       yticklabels=use_y_ticks,
       linewidths=0.1,
       cbar=False,
@@ -502,7 +509,7 @@ def make_mutation_heatmap_grid(
 ) -> None:
   """Makes a grid of mutation heatmaps."""
   _, axs = plt.subplots(
-      nrows=2, ncols=2, figsize=(65, 15), sharex=True, dpi=1000
+      nrows=2, ncols=2, figsize=(60, 15), sharex=True, dpi=1000
   )
   for i, (lib_name, df) in enumerate(
       [(a_name, utils.filter_to_g4_positions(df_a)), (b_name, df_b)]
@@ -533,7 +540,7 @@ def make_mutation_heatmap_grid(
       ax.set_title(
           f'{title_prefix}: {len(df_to_plot)} variants, {n_mut} distinct'
           ' mutations',
-          size=60,
+          size=70,
       )
   plt.xlim(
       left=constants.G4_VARIABLE_REGION_START,
@@ -599,7 +606,7 @@ def plot_subsampling_hit_rate(
       ax.set_title(title)
     if len(score_specs) > 1:
       ax.legend(loc='lower left')
-    _set_fontsize(ax, fontsize=fontsize)
+    set_fontsize(ax, fontsize=fontsize)
 
 
 def plot_zero_shot_histograms(
@@ -629,5 +636,9 @@ def plot_zero_shot_histograms(
       ax.set_title(title)
     ax = ax if ax else plt.gca()
     ax.set_ylabel('proportion')
-    ax.set_xlabel('zero-shot model score (WT score = 0)')
-    _set_fontsize(ax, fontsize)
+    ax.set_xlabel('zero-shot model score\n(WT score = 0)')
+    set_fontsize(ax, fontsize)
+    ax.get_legend().get_title().set_text(None)
+    ax.get_legend().get_title().set_fontsize(1)
+    ax.set(yticklabels=[])
+    ax.tick_params(left=False)

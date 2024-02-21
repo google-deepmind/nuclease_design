@@ -167,7 +167,13 @@ G4_INFO = {
         'read_count_3_98_g4',
         'read_count_4_99.5_g4',
     ],
-    'fiducials': ['neg_control', 'wt', 'a73r', 'a63p_a73r_d74h_i84y'],
+    'fiducials': [
+        'neg_control',
+        'wt',
+        'a73r',
+        'a73r_d74s',
+        'a63p_a73r_d74h_i84y',
+    ],
     'generation': 'g4',
 }
 
@@ -240,6 +246,7 @@ GENERATION_AND_REF_NAME_TO_GATE_NAME = {
         'neg_control': '1_70',
         'wt': '2_90',
         'a73r': '4_99.5',
+        'a73r_d74s': '4_99.5',
         'a63p_a73r_d74h_i84y': '4_99.5',
     },
 }
@@ -247,7 +254,7 @@ GENERATION_AND_REF_NAME_TO_GATE_NAME = {
 FIDUCIAL_NAME_TO_MUTATION_TUPLE = {
     'wt': (),
     'a73r': (('A', 73, 'R'),),
-    'double': (('A', 73, 'R'), ('D', 74, 'S')),
+    'a73r_d74s': (('A', 73, 'R'), ('D', 74, 'S')),
     'a63p_a73r_d74h_i84y': (
         ('A', 63, 'P'),
         ('A', 73, 'R'),
@@ -357,4 +364,25 @@ LANDSCAPE_ACTIVITY_LEVELS = (
     'activity_greater_than_0',
     'activity_greater_than_WT',
     'activity_greater_than_A73R',
+)
+
+
+NON_CAMPAIGN_SUBLIBRARIES = (
+    'g2_g1_plate_assay_variants',
+    'g2_wt_synonyms',
+    'g2_stratified_sample',
+    'g3_wt_synonyms',
+    'g3_g1_stratified_sample',
+    'g3_g2_plate_assay_variants',
+    'g3_a73r_synonyms',
+    'g4_mbo_seeds',
+    'g4_wt_synonyms',
+    'g4_stratified_sample',
+    'g4_g3_plate_assay_variants',
+    'g4_a73r_synonyms',
+    'g4_g3_hit_constituents',
+    'g4_homolog_graft',
+    'g4_double_synonyms',
+    'g4_quad_synonyms',
+    'prosar+screen_g2_redux',
 )

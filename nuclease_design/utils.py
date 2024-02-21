@@ -374,3 +374,19 @@ def expand_sublibraries(df: pd.DataFrame) -> pd.DataFrame:
       ],
       ignore_index=True,
   )
+
+
+def sublibrary_name_to_campaign_name(sublibrary_name: str) -> str:
+  """Returns the campaign name for `sublibrary_name`."""
+  if sublibrary_name.endswith('recombination'):
+    return 'HR'
+  elif sublibrary_name == 'g1_eppcr':
+    return 'epPCR'
+  elif sublibrary_name == 'zero_shot':
+    return 'zero_shot'
+  elif sublibrary_name in constants.NON_CAMPAIGN_SUBLIBRARIES:
+    return 'other'
+  elif sublibrary_name.endswith('unmatched'):
+    return 'unmatched'
+  else:
+    return 'ML'
