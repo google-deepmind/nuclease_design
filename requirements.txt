@@ -1,9 +1,10 @@
 absl-py
+biopython
 ipykernel
 numpy
 pandas
-scipy
-requests
-statsmodels
 pytest
-biopython
+requests
+scipy
+statsmodels
+tensorflow
