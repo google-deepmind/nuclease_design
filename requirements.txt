@@ -7,5 +7,6 @@ pandas
 pytest
 requests
 scipy
+seaborn
 statsmodels
 tensorflow
