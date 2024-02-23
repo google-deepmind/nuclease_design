@@ -1,6 +1,7 @@
 absl-py
 biopython
 ipykernel
+matplotlib
 numpy
 pandas
 pytest
