@@ -88,6 +88,7 @@ After this, run the tests:
 python -m pytest nuclease_design/*test.py
 ```
 
+Note that this repo requires requires Python >= 3.10
 
 ## Citing this work
 
