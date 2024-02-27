@@ -1,9 +1,12 @@
 absl-py
+biopython
 ipykernel
+matplotlib
 numpy
 pandas
-scipy
-requests
-statsmodels
 pytest
-biopython
+requests
+scipy
+seaborn
+statsmodels
+tensorflow
