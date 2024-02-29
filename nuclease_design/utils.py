@@ -50,8 +50,8 @@ def open_file(filename: str, mode: str, data_dir: str) -> IO[Union[bytes, str]]:
   full_filename = path.join(data_dir, filename)
 
   if data_dir == constants.GCS_DATA_DIR:
-    if mode != 'r':
-      raise ValueError('mode must be "r" when reading from GCS.')
+    if mode not in ['r', 'rb']:
+      raise ValueError('mode must be "r" or "rb" when reading from GCS.')
     return _read_from_gcs(full_filename)
   return open(full_filename, mode)
 
@@ -60,7 +60,7 @@ def copy_file(file_path, source_data_dir, target_data_dir, overwrite=False):
   output_path = path.join(target_data_dir, file_path)
   if not overwrite and path.exists(output_path):
     return
-  os.makedirs(path.dirname(output_path))
+  os.makedirs(path.dirname(output_path), exist_ok=True)
 
   source_bytes = open_file(
       file_path, mode='rb', data_dir=source_data_dir
