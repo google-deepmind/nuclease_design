@@ -365,12 +365,13 @@ def plot_diversity_overlay(
     xticks_max=26,
 ):
   """Makes multi-element plot showing library diversity."""
-  opacity_map = {'post-sort': 1.0, 'pre-sort': 0.2}
-  interval_opacity_map = {'post-sort': 0.2, 'pre-sort': 0.1}
+  opacity_map = {'post-sort': 1.0, 'pre-sort': 0.1}
+  interval_opacity_map = {'post-sort': 0.2, 'pre-sort': 0.05}
 
   with sns.axes_style('ticks'):
     df = df.sort_values([hue_feature, 'population']).copy()
     populations_to_plot = ['pre-sort', post_sort_population]
+    dash_style_dict = {post_sort_population: '', 'pre-sort': (5, 5)} # long dashes for post-sort
     plotdf = df[df['population'].isin(populations_to_plot)]
 
     ax = sns.lineplot(
@@ -380,6 +381,7 @@ def plot_diversity_overlay(
         hue=hue_feature,
         hue_order=hue_order,
         style='population',
+        dashes=dash_style_dict,
         errorbar=('ci', 95),
         palette=palette,
     )
@@ -405,10 +407,12 @@ def plot_diversity_overlay(
       plt.plot(
           0,
           initial_library_size,
-          marker=9,
+          marker=9, # triangle
           c=color,
-          label='Initial Library Size',
+          label=f'{hue_value} lib. size',
+          linestyle='',
           zorder=10,
+          markersize=10,
       )
 
     opacity_labels = [
@@ -431,6 +435,9 @@ def plot_diversity_overlay(
   )
   plt.gca().yaxis.set_minor_locator(minor_locator)
   sns.despine()
+
+  # adjust legend
+  plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
   return ax
 
 
