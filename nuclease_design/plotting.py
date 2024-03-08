@@ -644,8 +644,8 @@ def plot_zero_shot_histograms(
     if title:
       ax.set_title(title)
     ax = ax if ax else plt.gca()
-    ax.set_ylabel('proportion')
-    ax.set_xlabel('zero-shot model score\n(WT score = 0)')
+    ax.set_ylabel('Proportion')
+    ax.set_xlabel('Zero-shot model score\n(WT score = 0)')
     set_fontsize(ax, fontsize)
     ax.get_legend().get_title().set_text(None)
     ax.get_legend().get_title().set_fontsize(1)
