@@ -152,12 +152,15 @@ def plot_hit_rate_per_num_mutations(
       'a73r': 'A73R',
   }
   ax.set_title(
-      f'Hit Rate for Activity > {reference_to_title_str[reference_name]}'
+      f'Hit rate for activity > {reference_to_title_str[reference_name]}'
   )
   ax.set_ylim(bottom=0.0)
   ax.set_xlim(left=1)
   set_fontsize(ax, fontsize)
   ax.legend(title=hue_feature, fontsize=fontsize, title_fontsize=fontsize)
+
+  ax.set_xlabel('Number of mutations')
+  ax.set_ylabel('Hit rate')
   return ax
 
 
@@ -250,7 +253,6 @@ def plot_hit_rate_per_num_mutations_with_histogram(
   sns.despine()
   plt.tight_layout(pad=1)
   remove_underscores_from_axis_labels(ax0)
-
   return ax0
 
 
@@ -388,8 +390,8 @@ def plot_diversity_overlay(
 
     ax.set(yscale='log')
     remove_underscores_from_axis_labels(ax)
-    plt.ylabel('Number of Clusters')
-    plt.xlabel('Cluster Diameter')
+    plt.ylabel('Number of clusters')
+    plt.xlabel('Cluster diameter')
     sns.move_legend(ax, 'upper left', bbox_to_anchor=(1, 1))
     plt.ylim(bottom=1.0)
     plt.xlim(left=0, right=xticks_max - 1)
