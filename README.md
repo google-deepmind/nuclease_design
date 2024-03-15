@@ -6,7 +6,7 @@ This repository accompanies the paper "Engineering highly active and diverse nuc
 <!-- (TODO: bioarxiv link) -->
 
 <div style="width:70%; margin: auto;">
-<img src="images/overview.png">
+<img src="images/overview_wide.png">
 </div>
 
 ## Analyzing our enzyme activity dataset
