@@ -6,7 +6,7 @@ This repository accompanies the paper "Engineering highly active and diverse nuc
 <!-- (TODO: bioarxiv link) -->
 
 <div style="width:70%; margin: auto;">
-<img src="images/overview.png">
+<img src="images/overview_wide.png">
 </div>
 
 ## Analyzing our enzyme activity dataset
@@ -35,6 +35,8 @@ Some useful starting points:
 * Analyze the hit rates of various library design methods [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/plot_hit_rates.ipynb
 )
 * Analyze the diversity of hits from these libraries [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/plot_diversity.ipynb
+)
+* Check out the kinetic curves from our purified protein assay [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/plot_purified_protein_results.ipynb
 )
 * Play with the CNN model used for the final round of sequence design [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/analyze_cnn.ipynb
 )
