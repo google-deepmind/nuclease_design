@@ -36,6 +36,8 @@ Some useful starting points:
 )
 * Analyze the diversity of hits from these libraries [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/plot_diversity.ipynb
 )
+* Check out the kinetic curves from our purified protein assay [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/plot_purified_protein_results.ipynb
+)
 * Play with the CNN model used for the final round of sequence design [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/analyze_cnn.ipynb
 )
 
