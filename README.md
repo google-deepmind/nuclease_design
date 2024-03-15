@@ -17,7 +17,7 @@ A simple notebook has been provided to load and analyze the data: [<img src="htt
 
 
 <div style="width:70%; margin: auto;">
-<img src="images/landscape.png">
+<img src="images/landscape.png" width="900">
 </div>
 
 ## Reproducing the paper's analysis
