@@ -1,33 +1,48 @@
 
-# nuclease_design: ML-Guided Directed Evolution for Engineering a Better Nuclease Enzyme
+# ML-Guided Directed Evolution for Engineering a Better Nuclease Enzyme
 
-This project accompanies the paper "Engineering highly active and diverse nuclease enzymes by combining machine learning and ultra-high-throughput screening". Here, we provide library code and notebooks for reproducing all of the paper's data analysis as well as a 'landscape.csv' file that provides enzyme activity for 56K enzyme variants.
+This repository accompanies the paper "Engineering highly active and diverse nuclease enzymes by combining machine learning and ultra-high-throughput screening"
+
+<!-- (TODO: bioarxiv link) -->
+
+<div style="width:70%; margin: auto;">
+<img src="images/overview.png">
+</div>
+
+## Analyzing our enzyme activity dataset
+You can use our dataset of estimated enzyme activity for 55K NucB variants to develop new machine learning models or to generate new insights about NucB. 
+
+A simple notebook has been provided to load and analyze the data: [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/plot_landscape_analysis.ipynb
+)
 
 
-## Usage
+<div style="width:70%; margin: auto;">
+<img src="images/landscape.png">
+</div>
+## Reproducing the paper's analysis
 
-There are a few suggested ways to interact with this project:
+All figures and tables in the paper can be reproduced by notebooks in [notebooks/](https://github.com/google-deepmind/nuclease_design/tree/main/notebooks). 
 
-* Use the landscape file to develop machine learning models or to generate new insights about NucB enzymes. Quick start: [TODO: open_in_colab link for plot_landscape_analysis.ipynb].
+Each notebooks can be run as-is, since it loads pre-computed enrichment factor data from GCS (see below). To regenerate the analysis from the raw NGS count data, run
+[get_enrichment_factor_data.ipynb](https://github.com/google-deepmind/nuclease_design/tree/main/notebooks/get_enrichment_factor_data.ipynb)
+with a local value of `DATA_DIR` and then change `DATA_DIR` in the analysis notebooks and re run them. 
 
+These notebooks, and the library code they call, can be used to dig deeper into our results or to provide a jumping-off point for creating your own genotype-phenotype dataset based on count data from high-throughput sorting.
 
-* Use the data analysis notebooks to learn more about the results in the paper or about our approaches for processing count data, assigning variants discrete enzyme activity labels, and analyzing hit rates. Quick start: [TODO: open_in_colab link for plot_hit_rates.ipynb].
+## Analyzing our libraries and models
+Some useful starting points:
 
-
-## Code
-
-Notebooks for data processing
-and reproducing all of the figures and analysis in the paper's main text and
-supplement are found in `notebooks/`.
-
-Utilities for extracting enrichment factor data from raw NGS counts, analyzing
-results, and making plots are available in `nuclease_design/`.
+* Analyze the hit rates of various library design methods [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/plot_hit_rates.ipynb
+)
+* Analyze the diversity of hits from these libraries [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/plot_diversity.ipynb
+)
+* Play with the CNN model used for the final round of sequence design [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/analyze_cnn.ipynb
+)
 
 ## Data
-Data is available in a Google cloud storage (GCS) bucket:
-`https://storage.googleapis.com/nuclease-design-data`.
+All data is available in a Google cloud storage (GCS) [bucket](https://storage.googleapis.com/nuclease-design-data). We don't recommend directly downloading it; the above scripts use helper functions for loading from the bucket.
 
-It is organized in the following sub-directories:
+The bucket contains the following sub-directories:
 
 *   `raw_count_data`: raw NGS count data for pre-sort and post-sort populations.
 
@@ -59,41 +74,24 @@ It is organized in the following sub-directories:
 
 *   `alignments`: A multiple sequence alignment used to fit our VAE model.
 
-
-## Reproducing the paper's analysis
-
-All data analysis in the paper is produced by the above notebooks. To fully
-reproduce this analysis from the raw count data, run
-`get_enrichment_factor_data.ipynb` with a local value of `DATA_DIR` and then
-change `DATA_DIR` in the analysis notebooks. The analysis notebooks can also be
-re-run without changing `DATA_DIR``, in which case they will use the enrichment
-factor data that is already on GCS.
-
-## Installation
+## Running unit tests
 
 The notebooks directly install this package from GitHub, so no installation is
-necessary. However, you may want to locally install this package in order to run
-tests. It can be installed as follows:
+necessary. However, you can locally install this package in order to run tests using the following commands:
 
 ```
 venv=/tmp/nuclease_design_venv
 python3 -m venv $venv
 source $venv/bin/activate
 pip install -e .
-```
-
-After this, run the tests:
-
-```
 python -m pytest nuclease_design/*test.py
 ```
 
-Note that this repo requires requires Python >= 3.10
 
-## Citing this work
+<!-- ## Citing this work
 
-TODO: add citation details here, usually a pastable BibTeX snippet, when the
-paper appears on bioarxiv.
+TODO: update this when a bioarxiv link is available. -->
+
 
 ## License and disclaimer
 
