@@ -80,7 +80,7 @@ The bucket contains the following sub-directories:
 The notebooks directly install this package from GitHub, so no installation is
 necessary. However, you can locally install this package in order to run tests using the following commands:
 
-Note that our package required **python >= 3.10.**
+Note that our package requires **python >= 3.10.**
 
 ```
 venv=/tmp/nuclease_design_venv
