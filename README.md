@@ -12,7 +12,7 @@ This repository accompanies the paper "Engineering highly active and diverse nuc
 ## Analyzing our enzyme activity dataset
 You can use our dataset of estimated enzyme activity for 55K NucB variants to develop new machine learning models or to generate new insights about NucB. 
 
-A simple notebook has been provided to load and analyze the data: [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/plot_landscape_analysis.ipynb
+A simple notebook has been provided to load and analyze the data: [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/github/google-deepmind/nuclease_design/blob/main/notebooks/plot_landscape_analysis.ipynb
 )
 
 
@@ -33,13 +33,13 @@ These notebooks, and the library code they call, can be used to dig deeper into 
 ## Analyzing our libraries and models
 Some useful starting points:
 
-* Analyze the hit rates of various library design methods [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/plot_hit_rates.ipynb
+* Analyze the hit rates of various library design methods [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/github/google-deepmind/nuclease_design/blob/main/notebooks/plot_hit_rates.ipynb
 )
-* Analyze the diversity of hits from these libraries [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/plot_diversity.ipynb
+* Analyze the diversity of hits from these libraries [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/github/google-deepmind/nuclease_design/blob/main/notebooks/plot_diversity.ipynb
 )
-* Check out the kinetic curves from our purified protein assay [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/plot_purified_protein_results.ipynb
+* Check out the kinetic curves from our purified protein assay [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/github/google-deepmind/nuclease_design/blob/main/notebooks/plot_purified_protein_results.ipynb
 )
-* Play with the CNN model used for the final round of sequence design [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/google-deepmind/nuclease_design/blob/main/notebooks/analyze_cnn.ipynb
+* Play with the CNN model used for the final round of sequence design [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/github/google-deepmind/nuclease_design/blob/main/notebooks/analyze_cnn.ipynb
 )
 
 ## Data
