@@ -26,7 +26,7 @@ All figures and tables in the paper can be reproduced by notebooks in [notebooks
 
 Each notebooks can be run as-is, since it loads pre-computed enrichment factor data from GCS (see below). To regenerate the analysis from the raw NGS count data, run
 [get_enrichment_factor_data.ipynb](https://github.com/google-deepmind/nuclease_design/tree/main/notebooks/get_enrichment_factor_data.ipynb)
-with a local value of `DATA_DIR` and then change `DATA_DIR` in the analysis notebooks and re run them. 
+with a local value of `LOCAL_OUTPUT_DATA_DIR`.
 
 These notebooks, and the library code they call, can be used to dig deeper into our results or to provide a jumping-off point for creating your own genotype-phenotype dataset based on count data from high-throughput sorting.
 
