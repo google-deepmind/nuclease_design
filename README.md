@@ -37,8 +37,6 @@ Some useful starting points:
 )
 * Analyze the diversity of hits from these libraries [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/github/google-deepmind/nuclease_design/blob/main/notebooks/plot_diversity.ipynb
 )
-* Check out the kinetic curves from our purified protein assay [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/github/google-deepmind/nuclease_design/blob/main/notebooks/plot_purified_protein_results.ipynb
-)
 * Play with the CNN model used for the final round of sequence design [<img src="https://colab.research.google.com/assets/colab-badge.svg">](https://colab.research.google.com/github/google-deepmind/nuclease_design/blob/main/notebooks/analyze_cnn.ipynb
 )
 
@@ -82,7 +80,7 @@ The bucket contains the following sub-directories:
 The notebooks directly install this package from GitHub, so no installation is
 necessary. However, you can locally install this package in order to run tests using the following commands:
 
-Note that our package required **python >= 3.10.**
+Note that our package requires **python >= 3.10.**
 
 ```
 venv=/tmp/nuclease_design_venv
