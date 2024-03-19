@@ -651,3 +651,29 @@ def plot_zero_shot_histograms(
     ax.get_legend().get_title().set_fontsize(1)
     ax.set(yticklabels=[])
     ax.tick_params(left=False)
+
+
+def make_hits_histplot(train_df, design_df, activity_level, ax=None):
+  train_df = train_df.copy()
+  design_df = design_df.copy()
+  if activity_level not in {'neg_control', 'wt', 'a73r'}:
+    raise ValueError(f'{activity_level} not in [neg_control, wt, a73r]')
+
+  train_hits_df = train_df[
+      train_df[f'activity_greater_than_{activity_level}']
+  ].copy()
+  train_hits_df['set'] = 'training set hits'
+  design_hits_df = design_df[
+      design_df[f'activity_greater_than_{activity_level}']
+  ].copy()
+  design_hits_df['set'] = 'designed hits'
+  plotdf = pd.concat([train_hits_df, design_hits_df], ignore_index=True)
+  g = sns.histplot(
+      data=plotdf,
+      x='num_mutations',
+      hue='set',
+      multiple='layer',
+      discrete=True,
+      ax=ax,
+  )
+  g.legend_.set_title('')
