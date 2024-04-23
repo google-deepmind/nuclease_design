@@ -1,7 +1,7 @@
 
 # ML-Guided Directed Evolution for Engineering a Better Nuclease Enzyme
 
-This repository accompanies the paper: [Engineering highly active and diverse nuclease enzymes by combining machine learning and ultra-high-throughput screening](https://www.biorxiv.org/content/10.1101/2024.03.21.585615v1)
+This repository accompanies the paper: [Engineering highly active and diverse nuclease enzymes by combining machine learning and ultra-high-throughput screening](https://doi.org/10.1101/2024.03.21.585615)
 
 <div style="width:70%; margin: auto;">
 <img src="images/overview_wide.png">
@@ -91,7 +91,7 @@ python -m pytest nuclease_design/*test.py
 
 ## Citing this work
 
-Please cite the accompanying [paper](https://www.biorxiv.org/content/10.1101/2024.03.21.585615v1):
+Please cite the accompanying [paper](https://doi.org/10.1101/2024.03.21.585615):
 ```
 @article {thomasbelanger2024,
 	author = {Neil Thomas and David Belanger and Chenling Xu and Hanson Lee and Kat Hirano and Kosuke Iwai and Vanja Polic and Kendra D Nyberg and Kevin Hoff and Lucas Frenz and Charlie A Emrich and Jun W Kim and Mariya Chavarha and Abi Ramanan and Jeremy J Agresti and Lucy J Colwell},
