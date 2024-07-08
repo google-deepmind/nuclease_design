@@ -39,7 +39,7 @@ Some useful starting points:
 )
 
 ## Data
-All data is available in a Google cloud storage (GCS) [bucket](https://storage.googleapis.com/nuclease-design-data). We don't recommend directly downloading it; the above scripts use helper functions for loading from the bucket.
+All data is available in a Google cloud storage (GCS) [bucket](https://storage.googleapis.com/nuclease_design). We don't recommend directly downloading it; the above scripts use helper functions for loading from the bucket.
 
 The bucket contains the following sub-directories:
 
