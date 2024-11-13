@@ -176,7 +176,9 @@ def plot_hit_rate_per_num_mutations_with_histogram(
     num_bootstraps: int = utils.DEFAULT_NUM_BOOTSTRAPS,
     expected_false_discovery_rate: float = utils.EXPECTED_FDR,
     min_num_observations_per_bin: int = DEFAULT_MIN_NUM_OBSERVATIONS_PER_BIN,
-    fontsize: int = 20) -> plt.Axes:
+    fontsize: int = 20,
+    min_num_mutations: int = 1,
+    max_num_mutations: int = 25) -> plt.Axes:
   """Plots hit rates including histogram for num_mutations below.
 
   Args:
@@ -196,6 +198,8 @@ def plot_hit_rate_per_num_mutations_with_histogram(
     min_num_observations_per_bin: The minimum number of samples at a given
       radius. Groupings with fewer samples are filtered from the plot.
     fontsize: Font size.
+    min_num_mutations: the minimum number of mutations to label on the histogram.
+    max_num_mutations: the maximum number of mutations to label on the histogram.
 
   Returns:
     A matplotlib Axes object
@@ -230,7 +234,7 @@ def plot_hit_rate_per_num_mutations_with_histogram(
     set_fontsize(ax0, fontsize)
     for i, grouping in enumerate(hue_order):
       ax = plt.subplot(gs[i + 1], sharex=ax0)
-      sns.histplot(
+      hist = sns.histplot(
           data=df[df[hue_feature] == grouping],
           x='num_mutations',
           ax=ax,
@@ -241,14 +245,38 @@ def plot_hit_rate_per_num_mutations_with_histogram(
           palette=palette,
           stat='count',
       )
+      # Get counts before plotting
+      counts = df[df[hue_feature] == grouping]['num_mutations'].value_counts().sort_index()
+      max_count = counts.max()
+      # Add labels for each bin
+      for mut_num in counts.index:
+        if mut_num < min_num_mutations:
+          # don't plot below a certain number of mutations
+          continue
+        if mut_num > max_num_mutations:
+          continue
+        count = counts[mut_num]
+        if count > 0:  # Only label non-zero bins
+            if mut_num == min_num_mutations:
+              x_text = mut_num + 0.25
+            else:
+              x_text = mut_num
+            ax.text(x_text, count + max_count * 0.05,  # Small offset above bar
+                    str(int(count)),
+                    ha='center',
+                    va='bottom',
+                    fontsize=12)
+
+          
       ax.set_xlabel('')
       ax.set_ylabel('')
-      ax.set(yticklabels=[])
-      ax.tick_params('y', labelbottom=False)
       ax.tick_params('x', labelbottom=False)
+      ax.tick_params('y', labelleft=False)
       ax.legend_ = None
-      ax.grid(False)
       set_fontsize(ax, fontsize)
+      
+      # Adjust y-axis limit to accommodate labels
+      # ax.set_ylim(0, ax.get_ylim()[1] * 1.2)
 
   sns.despine()
   plt.tight_layout(pad=1)
