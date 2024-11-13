@@ -654,7 +654,7 @@ def plot_zero_shot_histograms(
   eppcr_df['activity'] = pd.Series(
       utils.select_hits(eppcr_df[pval_col], utils.EXPECTED_FDR)
   ).apply(lambda label: 'functional' if label else 'non-functional')
-  color_palette = {'non-functional': 'red', 'functional': 'green'}
+  color_palette = dict(zip(['non-functional', 'functional'], sns.color_palette('cubehelix_r', n_colors=4)[:2]))
   with sns.axes_style('ticks'):
     sns.histplot(
         data=eppcr_df,
