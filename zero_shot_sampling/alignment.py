@@ -498,7 +498,7 @@ class HomologConfig:
 
 
 def get_homolog_config_from_aligned_parent(
-    aligned_parent: str, tokens: Sequence[str] = amino_acids.AA_GAP
+    aligned_parent: str, tokens: Sequence[str] = amino_acids.ALL_AA_GAP
 ) -> HomologConfig:
   """Builds a HomologConfig using an aligned parent sequence.
 
@@ -527,7 +527,7 @@ def get_homolog_config_from_aligned_parent(
 
 
 def get_homolog_config_from_a2m_file(
-    a2m_file: str, tokens: Sequence[str] = amino_acids.AA_GAP
+    a2m_file: str, tokens: Sequence[str] = amino_acids.ALL_AA_GAP
 ) -> HomologConfig:
   """Builds a HomologConfig using the first record in an a2m fasta file."""
   homolog_df = utils.read_fasta_as_df(a2m_file, num_records=1)
