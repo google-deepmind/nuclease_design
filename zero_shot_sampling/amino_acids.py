@@ -62,4 +62,5 @@ AA_GAP = AA + tuple(GAP)
 EXTENDED_AA = tuple(AA_NAMES[i][0] for i in EXTENDED_INDICES)
 # Single letter codes of standard and extended amino acids.
 ALL_AA = STANDARD_AA + EXTENDED_AA
+ALL_AA_GAP = STANDARD_AA + EXTENDED_AA + tuple(GAP)
 
