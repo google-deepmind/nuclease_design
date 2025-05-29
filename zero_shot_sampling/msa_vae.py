@@ -116,7 +116,6 @@ def load(
   dummy_input = np.zeros((1, len(homolog_config.match_state_parent)), dtype=np.int32)
   _ = model.model(dummy_input)
 
-  print(path.join(model_path, 'model.weights.h5'))
   model.load_weights(path.join(model_path, 'model.weights.h5'))
 
   return model, homolog_config
