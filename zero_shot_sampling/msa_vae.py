@@ -113,8 +113,8 @@ def load(
   )
 
   # Build the model with a dummy input before loading weights
-  dummy_input = np.zeros((1, len(homolog_config.match_state_parent)), dtype=np.int32)
-  _ = model.model(dummy_input)
+  placeholder_input = np.zeros((1, len(homolog_config.match_state_parent)), dtype=np.int32)
+  _ = model.model(placeholder_input)
 
   model.load_weights(path.join(model_path, 'model.weights.h5'))
 
