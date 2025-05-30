@@ -86,7 +86,7 @@ def save(
   """Saves a VAE model and its metadata to disk."""
   utils.make_directory(model_path)
 
-  model.save_weights(path.join(model_path, 'weights'))
+  model.save_weights(path.join(model_path, 'model.weights.h5'))
 
   with utils.open_file(path.join(model_path, 'architecture'), 'w') as f:
     json.dump(architecture_hparams, f)
@@ -112,7 +112,11 @@ def load(
       **architecture_hparams,
   )
 
-  model.load_weights(path.join(model_path, 'weights'))
+  # Build the model with a dummy input before loading weights
+  placeholder_input = np.zeros((1, len(homolog_config.match_state_parent)), dtype=np.int32)
+  _ = model.model(placeholder_input)
+
+  model.load_weights(path.join(model_path, 'model.weights.h5'))
 
   return model, homolog_config
 

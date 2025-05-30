@@ -112,6 +112,22 @@ def build_decoder_output_model(
   return model
 
 
+class SamplingLayer(tf.keras.layers.Layer):
+  """Custom layer to handle sampling from the latent space."""
+  def call(self, inputs):
+    mu, log_std = inputs
+    eps = tf.random.normal(shape=tf.shape(mu))
+    std = tf.exp(log_std)
+    return eps * std + mu
+
+
+class VAELossLayer(tf.keras.layers.Layer):
+  """Custom layer to compute KL divergence loss."""
+  def call(self, inputs):
+    mu, log_std = inputs
+    return -0.5 * tf.reduce_sum(1 + log_std - mu**2 - tf.exp(log_std), axis=1)
+
+
 class VAE:
   """Variational Auto-Encoder."""
 
@@ -146,7 +162,10 @@ class VAE:
 
     # Encoder
     encoder_input = tf.keras.layers.Input((domain.length,), dtype=tf.int32)
-    one_hot_encoder_input = tf.one_hot(encoder_input, max(domain.vocab_sizes))
+    one_hot_encoder_input = tf.keras.layers.Lambda(
+        lambda x: tf.one_hot(x, max(domain.vocab_sizes)),
+        output_shape=(domain.length, max(domain.vocab_sizes))
+    )(encoder_input)
     x = layers.EncodingLayer(
         conv_layer_params=None,
         fc_layer_params=fc_layer_params,
@@ -158,7 +177,7 @@ class VAE:
     log_std = tf.keras.layers.Dense(num_latents)(x)
 
     encoder = tf.keras.Model(inputs=encoder_input, outputs=[mu, log_std],
-                             name='%s/encoder' % name)
+                             name='%s_encoder' % name)
 
     # Decoder
     decoder_input = tf.keras.layers.Input((num_latents,))
@@ -170,19 +189,16 @@ class VAE:
     )(decoder_input)
     x = build_decoder_output_model(domain)(x)
     decoder = tf.keras.Model(inputs=decoder_input, outputs=x,
-                             name='%s/decoder' % name)
+                             name='%s_decoder' % name)
 
     # VAE
-    eps = tf.random.normal(shape=tf.shape(mu))
-    std = tf.exp(log_std)
-    z = eps * std + mu
+    z = SamplingLayer()([mu, log_std])
     x_pred = decoder(z)
-
-    kl = -0.5 * tf.reduce_sum(1 + log_std - mu**2 - tf.exp(log_std), axis=1)
+    kl = VAELossLayer()([mu, log_std])
 
     vae = tf.keras.models.Model(inputs=[encoder_input],
                                 outputs=[x_pred, kl],
-                                name='%s/base' % name)
+                                name='%s_base' % name)
 
     loss = [loss_fn, identity_loss]
     optimizer = optimizer or tf.keras.optimizers.Adam(learning_rate=0.001)
